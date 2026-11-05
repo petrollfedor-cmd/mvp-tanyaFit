@@ -1,26 +1,14 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+:root { --green: #237a58; --ink: #1c2b25; --muted: #67766e; --canvas: #f4f7f4; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--canvas); font-family: Arial, sans-serif; }
+button { font: inherit; }
+.app-shell { max-width: 1160px; margin: 0 auto; padding: 20px 20px 56px; }
+.topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; }
+.brand { display:flex; align-items:center; gap:9px; font-size:22px; font-weight:800; letter-spacing:-.8px; }.brand-mark { display:grid; place-items:center; width:34px; height:34px; background:var(--green); color:#fff; border-radius:11px; }
+.auth-card { max-width:500px; margin:0 auto 28px; box-shadow:0 12px 35px #204d3820; }.auth-card h3 { margin-bottom:4px!important; }.config-alert { margin-top:16px; }
+.hero { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:38px; min-height:246px; color:#fff; border-radius:28px; background:linear-gradient(130deg,#215b46,#358d67); overflow:hidden; }.hero h1 { max-width:550px; color:#fff!important; margin:7px 0!important; font-size:40px!important; }.hero .ant-typography { color:#e6f4ed; }.eyebrow { color:#bfe8d1!important; font-weight:700; font-size:11px; letter-spacing:1.2px; }.calorie-orb { flex:0 0 158px; height:158px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid #ffffff4d; border-radius:50%; background:#ffffff18; }.calorie-orb svg { font-size:21px; color:#ffcd6d; }.calorie-orb strong { font-size:34px; line-height:1.2; }.calorie-orb span { font-size:12px; color:#d4ebdf; }
+.dashboard-grid { display:grid; grid-template-columns:1.35fr .9fr; gap:18px; margin-top:18px; }.panel, .food-panel { border-radius:22px!important; box-shadow:0 5px 20px #244b3920; }.calculator-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }.calculator-grid label { display:flex; flex-direction:column; gap:7px; color:var(--muted); font-size:13px; font-weight:600; }.calculator-grid .ant-input-number, .calculator-grid .ant-select { width:100%; }.calculator-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; }.macro-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding-top:22px; margin-top:22px; border-top:1px solid #e9efeb; }.macro-grid .ant-statistic-content { font-size:22px; }.eaten-row { display:flex; align-items:baseline; gap:6px; margin:12px 0 16px; }.eaten-row strong { font-size:26px; }.eaten-row span { color:var(--muted); font-size:13px; }.empty-diary, .no-products { padding:24px 0; color:var(--muted); text-align:center; }.entry-list { max-height:250px; overflow:auto; }.entry { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-top:1px solid #edf1ee; }.entry div { min-width:0; display:flex; flex-direction:column; }.entry strong { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }.entry span { color:var(--muted); font-size:11px; }.entry b { white-space:nowrap; font-size:12px; }
+.food-panel { margin-top:18px; padding:26px; background:#fff; }.food-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:18px; }.food-heading h2 { margin:0!important; font-size:23px!important; }.meal-picker { margin-bottom:14px; }.search-row { display:flex; width:100%; }.barcode-row { display:flex; gap:8px; margin-top:10px; }.barcode-row .ant-input { flex:1; }.scanner { display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:12px; }.scanner video { width:min(100%,420px); border-radius:14px; background:#17221d; }.product-list { margin-top:12px; border-top:1px solid #edf1ee; }.product-item { width:100%; display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:14px; border:0; border-bottom:1px solid #edf1ee; padding:14px 5px; text-align:left; background:transparent; cursor:pointer; transition:background .15s; }.product-item:hover { background:#f1f8f4; }.product-item img { width:44px; height:44px; border-radius:9px; object-fit:cover; }.product-item span { display:flex; flex-direction:column; }.product-item strong { font-size:14px; }.product-item small { color:var(--muted); font-size:12px; }.product-form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0 12px; }.full-width { width:100%; }.modal-actions { width:100%; display:flex; justify-content:flex-end; }.profile-card { margin-top:18px; border-radius:22px!important; }
+@media (max-width: 680px) { .app-shell { padding:14px 12px 30px; }.topbar { margin-bottom:18px; }.hero { align-items:flex-start; min-height:200px; padding:24px; border-radius:22px; }.hero h1 { font-size:29px!important; line-height:1.1!important; }.calorie-orb { flex-basis:93px; width:93px; height:93px; }.calorie-orb strong { font-size:21px; }.calorie-orb span { font-size:9px; }.dashboard-grid { grid-template-columns:1fr; }.calculator-grid { grid-template-columns:1fr 1fr; }.calculator-actions { align-items:flex-start; flex-direction:column; }.macro-grid { grid-template-columns:repeat(2,1fr); }.food-panel { padding:20px 16px; }.food-heading { align-items:center; }.food-heading h2 { font-size:19px!important; }.food-heading .ant-btn { padding-inline:10px; }.meal-picker { width:100%; overflow:auto; }.meal-picker .ant-segmented-group { min-width:max-content; }.barcode-row { flex-wrap:wrap; }.barcode-row .ant-input { min-width:100%; }.product-item { grid-template-columns:auto 1fr auto; }.product-item > svg { display:none; }.auth-card { margin-bottom:18px; } }

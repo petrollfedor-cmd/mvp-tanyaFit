@@ -1,0 +1,2 @@
+import type { MetadataRoute } from "next";
+export default function manifest(): MetadataRoute.Manifest { return { name: "myFitnea", short_name: "myFitnea", description: "Калькулятор калорий и дневник питания", start_url: "/", display: "standalone", background_color: "#f4f7f4", theme_color: "#237a58", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] }; }
