@@ -36,6 +36,7 @@ function HomeContent() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanTimerRef = useRef<number | null>(null);
+  const scannerControlsRef = useRef<{ stop: () => void } | null>(null);
   const [calculator, setCalculator] = useState<Calculator>({});
   const target = useMemo(() => {
     if (!calculator.sex || !calculator.age || !calculator.weight || !calculator.height || !calculator.activity || !calculator.goal) return null;
@@ -46,16 +47,33 @@ function HomeContent() {
   }, [calculator]);
   const eaten = useMemo(() => entries.reduce((total, item) => total + item.calories, 0), [entries]);
   const displayName = profileName || String(session?.user.user_metadata.full_name ?? session?.user.user_metadata.name ?? session?.user.email ?? "Пользователь");
-  function stopScanner() { if (scanTimerRef.current) window.clearInterval(scanTimerRef.current); scanTimerRef.current = null; streamRef.current?.getTracks().forEach((track) => track.stop()); streamRef.current = null; setScannerOpen(false); }
+  function stopScanner() { if (scanTimerRef.current) window.clearInterval(scanTimerRef.current); scanTimerRef.current = null; scannerControlsRef.current?.stop(); scannerControlsRef.current = null; streamRef.current?.getTracks().forEach((track) => track.stop()); streamRef.current = null; setScannerOpen(false); }
   async function searchProducts(query = search, code = "") {
     const value = code || query.trim(); if ((!code && value.length < 2) || !value) return setProducts([]); setSearchLoading(true);
     try { const response = await fetch(`/api/products?${new URLSearchParams(code ? { barcode: code } : { q: value })}`); const data = await response.json() as { products?: Product[]; error?: string }; if (!response.ok) throw new Error(data.error ?? "Ошибка поиска."); setProducts(data.products ?? []); if (code && !data.products?.length) message.info("Продукт с таким штрихкодом не найден. Можно добавить его вручную."); } catch (error) { message.error(error instanceof Error ? error.message : "Не удалось найти продукт."); } finally { setSearchLoading(false); }
   }
   async function openScanner() {
     const Detector = (window as typeof window & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
-    if (!Detector || !navigator.mediaDevices?.getUserMedia) return message.info("Сканер не поддерживается этим браузером. Введите штрихкод вручную.");
+    if (!navigator.mediaDevices?.getUserMedia) return message.info("Ваш браузер не даёт доступ к камере. Введите штрихкод вручную.");
     setScannerMessage("");
-    try { const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false }); streamRef.current = stream; setScannerOpen(true); window.setTimeout(() => { if (videoRef.current) { videoRef.current.srcObject = stream; void videoRef.current.play(); } }, 0); const detector = new Detector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] }); scanTimerRef.current = window.setInterval(async () => { if (!videoRef.current || videoRef.current.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return; const codes = await detector.detect(videoRef.current).catch(() => []); const found = codes[0]?.rawValue?.replace(/\D/g, ""); if (found) { setBarcode(found); stopScanner(); void searchProducts("", found); } }, 400); } catch { setScannerMessage("Не удалось открыть камеру. Разрешите доступ к камере или введите штрихкод вручную."); }
+    setScannerOpen(true);
+    try {
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      if (!videoRef.current) throw new Error("Видео не инициализировано.");
+      if (Detector) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+        streamRef.current = stream;
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        const detector = new Detector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] });
+        scanTimerRef.current = window.setInterval(async () => { if (!videoRef.current || videoRef.current.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return; const codes = await detector.detect(videoRef.current).catch(() => []); const found = codes[0]?.rawValue?.replace(/\D/g, ""); if (found) { setBarcode(found); stopScanner(); void searchProducts("", found); } }, 400);
+        return;
+      }
+      setScannerMessage("Используем совместимый режим сканирования для этого браузера.");
+      const { BrowserMultiFormatReader } = await import("@zxing/browser");
+      const reader = new BrowserMultiFormatReader();
+      scannerControlsRef.current = await reader.decodeFromConstraints({ video: { facingMode: { ideal: "environment" } }, audio: false }, videoRef.current, (result) => { const found = result?.getText().replace(/\D/g, ""); if (found) { setBarcode(found); stopScanner(); void searchProducts("", found); } });
+    } catch { stopScanner(); setScannerMessage("Не удалось открыть камеру. Разрешите доступ к камере и попробуйте ещё раз, либо введите штрихкод вручную."); }
   }
   useEffect(() => () => stopScanner(), []);
   useEffect(() => { if (!isSupabaseConfigured) return; const supabase = createClient(); supabase.auth.getSession().then(({ data }) => setSession(data.session)); const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession)); if (new URLSearchParams(window.location.search).get("login") === "success") { message.success("Вы вошли в аккаунт"); window.history.replaceState({}, "", "/"); } return () => listener.subscription.unsubscribe(); }, [message]);
