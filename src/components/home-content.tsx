@@ -69,10 +69,13 @@ function HomeContent() {
         scanTimerRef.current = window.setInterval(async () => { if (!videoRef.current || videoRef.current.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return; const codes = await detector.detect(videoRef.current).catch(() => []); const found = codes[0]?.rawValue?.replace(/\D/g, ""); if (found) { setBarcode(found); stopScanner(); void searchProducts("", found); } }, 400);
         return;
       }
-      setScannerMessage("Используем совместимый режим сканирования для этого браузера.");
-      const { BrowserMultiFormatReader } = await import("@zxing/browser");
-      const reader = new BrowserMultiFormatReader();
-      scannerControlsRef.current = await reader.decodeFromConstraints({ video: { facingMode: { ideal: "environment" } }, audio: false }, videoRef.current, (result) => { const found = result?.getText().replace(/\D/g, ""); if (found) { setBarcode(found); stopScanner(); void searchProducts("", found); } });
+      setScannerMessage("Наведите камеру на штрихкод: весь код должен быть в кадре, без бликов, на расстоянии 10–20 см.");
+      const [{ BrowserMultiFormatReader }, { BarcodeFormat, DecodeHintType }] = await Promise.all([import("@zxing/browser"), import("@zxing/library")]);
+      const hints = new Map<import("@zxing/library").DecodeHintType, unknown>();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E, BarcodeFormat.CODE_128]);
+      hints.set(DecodeHintType.TRY_HARDER, true);
+      const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 120, delayBetweenScanSuccess: 500 });
+      scannerControlsRef.current = await reader.decodeFromConstraints({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }, videoRef.current, (result) => { const found = result?.getText().replace(/\D/g, ""); if (found) { setBarcode(found); stopScanner(); void searchProducts("", found); } });
     } catch { stopScanner(); setScannerMessage("Не удалось открыть камеру. Разрешите доступ к камере и попробуйте ещё раз, либо введите штрихкод вручную."); }
   }
   useEffect(() => () => stopScanner(), []);
