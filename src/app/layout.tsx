@@ -3,8 +3,8 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "myFitnea — дневник питания",
-  description: "Калькулятор калорий и дневник питания",
+  title: "myFitnea — тренировки и питание",
+  description: "Персональные тренировки, калькулятор калорий и дневник питания",
   applicationName: "myFitnea",
   appleWebApp: { capable: true, title: "myFitnea" },
 };
