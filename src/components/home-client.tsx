@@ -2,8 +2,8 @@
 
 import dynamic from "next/dynamic";
 
-const HomeContent = dynamic(() => import("@/components/home-content"), { ssr: false });
+const NutritionDashboard = dynamic(() => import("@/components/nutrition-dashboard"), { ssr: false });
 
 export default function HomeClient() {
-  return <HomeContent />;
+  return <NutritionDashboard />;
 }
