@@ -1,7 +1,7 @@
-import TrainingClient from "@/components/training-client";
+import HomeClient from "@/components/home-client";
 import { connection } from "next/server";
 
 export default async function Home() {
   await connection();
-  return <TrainingClient />;
+  return <HomeClient />;
 }

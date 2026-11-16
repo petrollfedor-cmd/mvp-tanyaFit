@@ -161,7 +161,7 @@ function NutritionDashboardContent() {
       <header className="topbar">
         <div className="brand"><span className="brand-mark"><FireOutlined /></span>myFitnea</div>
         {session && <Space wrap>
-          <Space.Compact className="section-nav"><Link href="/"><Button>Тренировки</Button></Link><Button type="primary">Питание</Button></Space.Compact>
+          <Space.Compact className="section-nav"><Link href="/training"><Button>Тренировки</Button></Link><Button type="primary">Питание</Button></Space.Compact>
           <Tag className="profile-tag" icon={<Avatar size="small" src={avatarUrl} icon={<UserOutlined />} />} color="green">{displayName}</Tag>
           <Button icon={<LogoutOutlined />} onClick={() => void signOut()}>Выйти</Button>
         </Space>}
